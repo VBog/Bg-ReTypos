@@ -125,21 +125,19 @@ class MyClientInterface extends TyposClientInterface {
      */
     protected function clearText(string $text) {
 	
-		$text = strip_tags ($text);
+		// Strip all tags from text
+		$text = strip_tags($text);
 		
 		/*	Double quotes		*/
-		$text = preg_replace ('/[\u201C\u201D\u2033\xAB\xBB]/', '"', $text);
+		$text = str_replace (array('&#8220;','&#8221;','&#8243;','&#171;','&#187;'), '\"', $text);
 		/*	Single quotes		*/
-		$text = preg_replace ('/[\u2018\u2019\u2032]/', "'", $text);
+		$text = str_replace (array('&#8218;','&#8219;','&#8242;'), '\'', $text);
 		/*	Hyphens	*/
-		$text = preg_replace ('/[\u2014\u2013\u2012\u2011]/', "-", $text);
-		$text = preg_replace ('/-{2,}/', "-", $text);
+		$text = str_replace (array('&#8209;','&#8210;','&#8211;','&#8212;'), '-', $text);
 		/*	Spaces	*/
-		$text = preg_replace ('/[\xA0\t\v\f]/', " ", $text);
-		$text = preg_replace ('/ {2,}/', " ", $text);
+		$text = preg_replace ('/[\xA0\t\v\f]/ui', " ", $text);
 		/*	End of line		*/
-		$text = preg_replace ('/\r\n|\n\r|\r/', "\n", $text);
-		$text = preg_replace ('/\n{2,}/', "\n", $text);
+		$text = preg_replace ('/\r\n|\n\r|\r/ui', "\n", $text);
 
 		/*	Dots	*/
 		$text = str_replace ('&#8230;', "...", $text);
@@ -148,7 +146,16 @@ class MyClientInterface extends TyposClientInterface {
 		/*	Multiplication sign	*/
 		$text = str_replace ('&#215;', "x", $text);
 
-		// Strip all tags from text
-		$text = strip_tags($text);
+		// Strip duble hyphenes and whitespaces
+		$text = preg_replace ('/-{2,}/', "-", $text);
+		$text = preg_replace ('/\s{2,}/ui', "\n", $text);
+
+		// Strip whitespace from the beginning and end of a string
+		$text = trim ($text);
+
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . '^getArticleEditLink: '. $text, 3, RETYPOS_DEBUG_FILE);
+		
+		return $text;
+
 	}
 }
