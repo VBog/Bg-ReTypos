@@ -31,7 +31,10 @@ class MyClientInterface extends TyposClientInterface {
 //		$post = get_post($id);
 
 		$path_parts = pathinfo($link);
-		$slug = $path_parts['filename']; 
+		$slug = explode("#", $path_parts['filename']); 				// Удаляем якорь, если есть
+		$slug = $slug[0]; 
+		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
 		$post_types = get_post_types( [ 'publicly_queryable'=>1 ] );
 		$post_types['page'] = 'page';       // встроенный тип не имеет publicly_queryable
@@ -79,7 +82,10 @@ class MyClientInterface extends TyposClientInterface {
 //		$id = url_to_postid($link);
 
 		$path_parts = pathinfo($link);
-		$slug = $path_parts['filename']; 
+		$slug = explode("#", $path_parts['filename']); 				// Удаляем якорь, если есть
+		$slug = $slug[0]; 
+		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleIdFromLink: slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
 		$post_types = get_post_types( [ 'publicly_queryable'=>1 ] );
 		$post_types['page'] = 'page';       // встроенный тип не имеет publicly_queryable
@@ -135,9 +141,9 @@ class MyClientInterface extends TyposClientInterface {
 		/*	Hyphens	*/
 		$text = str_replace (array('&#8209;','&#8210;','&#8211;','&#8212;'), '-', $text);
 		/*	Spaces	*/
-		$text = preg_replace ('/[\xA0\t\v\f]/ui', " ", $text);
+		$text = preg_replace ('/[\xA0\t\v\f]/u', " ", $text);
 		/*	End of line		*/
-		$text = preg_replace ('/\r\n|\n\r|\r/ui', "\n", $text);
+		$text = preg_replace ('/\r\n|\n\r|\r/u', "\n", $text);
 
 		/*	Dots	*/
 		$text = str_replace ('&#8230;', "...", $text);
@@ -148,12 +154,12 @@ class MyClientInterface extends TyposClientInterface {
 
 		// Strip duble hyphenes and whitespaces
 		$text = preg_replace ('/-{2,}/', "-", $text);
-		$text = preg_replace ('/\s{2,}/ui', "\n", $text);
+		$text = preg_replace ('/\s{2,}/u', "\n", $text);
 
 		// Strip whitespace from the beginning and end of a string
 		$text = trim ($text);
 
-		if(RETYPOS_DEBUG) error_log( PHP_EOL . '^getArticleEditLink: '. $text, 3, RETYPOS_DEBUG_FILE);
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . '^clearText: '. $text, 3, RETYPOS_DEBUG_FILE);
 		
 		return $text;
 

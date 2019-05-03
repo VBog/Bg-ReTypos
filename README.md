@@ -7,7 +7,7 @@ Requires at least: 3.0.1
 
 Tested up to: 5.1.0
 
-Stable tag: trunk
+Stable tag: master
 
 License: GPLv2
 
@@ -44,12 +44,26 @@ RewriteRule ^correctTypo$ /propovedi/reTypo.php [L]
 ```
 и удаляет его при деактивации плагина.
 
-Установить баннер на странице можно используя либо шорт-код `[retypos_banner]`, либо функцию `retypos_banner();`:
+Установить баннер ![ReTypos banner](https://gitlab.eterfund.ru/VBog/RETypos/raw/master/img/retypos.png) на странице можно используя либо шорт-код `[retypos_banner]`, либо функцию `retypos_banner();`:
 ```php
 	<?php if (function_exists('retypos_banner')) echo retypos_banner(); ?>
 ```
 
 ## Changelog ##
+
+= 1.2.3 =
+
+* Реализована мечта Виталия - убран файл retypo.php из корня.
+* Обработаны случаи ссылок с якорями и бред с "корварами"
+* Пофисены патерны ошибок и контекста.
+
+= 1.2.2 =
+
+* Испровлены ошибки в clearText()
+
+= 1.2.1 =
+
+* Запрещена отправка ошибок не со страниц постов
 
 = 1.2.0 =
 

@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: ambulance
- * Date: 27.04.19
- * Time: 10:10
+ * Date: 03.05.19
+ * Time: 20:30
  */
 
 namespace Etersoft\Typos;
@@ -235,9 +235,11 @@ abstract class TyposClientInterface
 		$text		= $this->clearText($text);
 
         // Find all typos in text, capture an offset of each typo
-        if (!preg_match_all("#{$typo}#", $text, $typos, PREG_OFFSET_CAPTURE)) {
+		$pattern = preg_quote ($typo, '#');
+        if (!preg_match_all("#{$pattern}#u", $text, $typos, PREG_OFFSET_CAPTURE)) {
             // Check for already fixed typo
-            if (preg_match("#{$corrected}#", $text, $typos, PREG_OFFSET_CAPTURE)) {
+			$pattern = preg_quote ($corrected, '#');
+            if (preg_match("#{$pattern}#u", $text, $typos, PREG_OFFSET_CAPTURE)) {
                 throw new \Exception("Already fixed", 208);
             }
 
@@ -247,7 +249,8 @@ abstract class TyposClientInterface
         // Find a context in text, capture it offset
         
 
-        if (!preg_match("#{$context}#", $text, $contextMatch, PREG_OFFSET_CAPTURE)) {
+		$pattern = preg_quote ($context, '#');
+		if (!preg_match("#{$pattern}#u", $text, $contextMatch, PREG_OFFSET_CAPTURE)) {
 			// If a context was changed then report an error,
 			// cannot locate typo in a new context, must be
 			// fixed manually
@@ -268,7 +271,8 @@ abstract class TyposClientInterface
 
         // Fix a match with index = $indexOfTypo
         $index = 0;
-        return preg_replace_callback("#{$typo}#",
+		$pattern = preg_quote ($typo, '#');
+        return preg_replace_callback("#{$pattern}#u",
             function($match) use(&$index, $indexOfTypo, $corrected) {
                 $index++;
                 if (($index - 1) == $indexOfTypo) {

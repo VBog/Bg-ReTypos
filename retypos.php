@@ -3,7 +3,7 @@
     Plugin Name: Retypos 
     Plugin URI: https://gitlab.eterfund.ru/eterfund/
     Description: Позволяет пользователям Вашего сайта отправлять сообщения об опечатках на его страницах.
-    Version: 1.2.2
+    Version: 1.2.3
     Author: VBog
     Author URI: https://bogaiskov.ru 
 	License:     GPL2
@@ -36,7 +36,7 @@ if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
 
-define('RETYPOS_VERSION', '1.2.2');
+define('RETYPOS_VERSION', '1.2.3');
 define('RETYPOS_DEBUG', false );
 define('RETYPOS_DEBUG_FILE', dirname(__FILE__ )."/retypos.log");
 define('RETYPOS_SERVER_IP', '91.232.225.9');
@@ -57,14 +57,14 @@ if ( !is_admin() ) {
 }
 // Функция, исполняемая при активации плагина
 function retypos_activate() {
-	if (!file_exists(get_home_path().'/reTypo.php')) @copy( plugin_dir_path( __FILE__ ).'/correctTypo.php', get_home_path().'/reTypo.php' );
+	if (file_exists(get_home_path().'/reTypo.php')) unlink (get_home_path().'/reTypo.php');
 	reTypo_rewrite_rule();
 	flush_rewrite_rules();
 }
 // Добавляет новое правило перезаписи URL (ЧПУ) в структуру правил WordPress: 
-// заменить correctTypo на reTypo.php (см. .htaccess)
+// заменить correctTypo на correctTypo.php в папаке плагина (см. .htaccess)
 function reTypo_rewrite_rule() {
-  add_rewrite_rule('correctTypo$', 'reTypo.php');
+	add_rewrite_rule('correctTypo$', str_replace(site_url('/'), '', plugins_url( 'correctTypo.php', __FILE__ )));
 }
 register_activation_hook( __FILE__, 'retypos_activate' );
 
@@ -74,12 +74,6 @@ function retypos_deactivate() {
 	flush_rewrite_rules();
 }
 register_deactivation_hook( __FILE__, 'retypos_deactivate' );
-
-// Функция, исполняемая при удалении плагина
-function retypos_uninstall() {
-	unlink (get_home_path().'/reTypo.php');
-}
-register_uninstall_hook(__FILE__, 'retypos_uninstall');
 
 //	JsonRPC - библиотека поддержки  протокола удалённого вызова процедур, 
 //	использующий JSON для кодирования сообщений. 
