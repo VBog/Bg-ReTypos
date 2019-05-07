@@ -151,11 +151,10 @@ abstract class TyposClientInterface
 
         // Trying to replace typo in text
         try {
-            error_log("Trying to find a typo in article text...");
             $article->text = $this->replaceTypoInText($typo, $corrected, $context, $article->text);
             return;
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            error_log("Error while find a typo in article text. ".$e->getMessage());
 			
 			// If a corrected of the typo is found in the text, remember this and, 
 			// if in other parts (title and subtitle) the typo or context is not found, 
@@ -173,11 +172,10 @@ abstract class TyposClientInterface
 
         // Trying to replace typo in title
         try {
-            error_log("Trying to find a typo in article title...");
             $article->title = $this->replaceTypoInText($typo, $corrected, $context, $article->title);
             return;
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            error_log("Error while find a typo in article title. ".$e->getMessage());
             if ($e->getCode() == 208) {
                 $isAlreadyFixed = true;
             }
@@ -188,9 +186,9 @@ abstract class TyposClientInterface
 
         // Trying to replace typo in subtitle
         try {
-            error_log("Trying to find a typo in article subtitle...");
             $article->subtitle = $this->replaceTypoInText($typo, $corrected, $context, $article->subtitle);
         } catch (\Exception $e) {
+            error_log("Error while find a typo in article subtitle. ".$e->getMessage());
             if (($e->getCode() == 404 || $e->getCode() == 405) && $isAlreadyFixed) {
                 throw new \Exception("Already fixed", 208);
             }
