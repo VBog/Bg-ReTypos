@@ -51,6 +51,10 @@ RewriteRule ^correctTypo$ /propovedi/wp-content/plugins/retypos/correctTypo.php 
 
 ## Changelog ##
 
+= 1.2.5 =
+
+* Исправлена бага с заменой двойного пробела и переноса строк
+
 = 1.2.4 =
 
 * Запись в error_log только при возникновении ошибок.

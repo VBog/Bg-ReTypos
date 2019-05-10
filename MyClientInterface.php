@@ -154,7 +154,8 @@ class MyClientInterface extends TyposClientInterface {
 
 		// Strip duble hyphenes and whitespaces
 		$text = preg_replace ('/-{2,}/', "-", $text);
-		$text = preg_replace ('/\s{2,}/u', "\n", $text);
+		$text = preg_replace ('/ {2,}/u', " ", $text);
+		$text = preg_replace ('/\n{2,}/u', "\n", $text);
 
 		// Strip whitespace from the beginning and end of a string
 		$text = trim ($text);
