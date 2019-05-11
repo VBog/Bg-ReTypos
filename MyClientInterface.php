@@ -131,6 +131,9 @@ class MyClientInterface extends TyposClientInterface {
      */
     protected function clearText(string $text) {
 	
+		$option = get_option('retypos_options');
+		if (isset($option['clear_off']) && $option['clear_off']) return $text;
+
 		// Strip all tags from text
 		$text = strip_tags($text);
 		
