@@ -137,26 +137,33 @@ class MyClientInterface extends TyposClientInterface {
 		// Strip all tags from text
 		$text = strip_tags($text);
 		
-		/*	Double quotes		*/
+		/*	Double quotes */
 		$text = str_replace (array('&#8220;','&#8221;','&#8243;','&#171;','&#187;'), '\"', $text);
-		/*	Single quotes		*/
+		$text = preg_replace ('/[\x{201C}\x{201D}\x{2033}\x{00AB}\x{00BB}]/u', '"', $text);
+		/*	Single quotes */
 		$text = str_replace (array('&#8218;','&#8219;','&#8242;'), '\'', $text);
+		$text = preg_replace ('/[\x{201A}\x{201B}\x{2032}]/u', '\'', $text);
 		/*	Hyphens	*/
 		$text = str_replace (array('&#8209;','&#8210;','&#8211;','&#8212;'), '-', $text);
+		$text = preg_replace ('/[\x{2011}\x{2012}\x{2013}\x{2014}]/u', '-', $text);
 		/*	Spaces	*/
+		$text = str_replace ('&nbsp;', " ", $text);
 		$text = preg_replace ('/[\xA0\t\v\f]/u', " ", $text);
-		/*	End of line		*/
+		/*	End of line */
 		$text = preg_replace ('/\r\n|\n\r|\r/u', "\n", $text);
 
 		/*	Dots	*/
 		$text = str_replace ('&#8230;', "...", $text);
+		$text = preg_replace ('/\x{2026}/u', "...", $text);
 		/*	Trade Mark	*/
 		$text = str_replace ('&#8482;', "(tm)", $text);
+		$text = preg_replace ('/\x{2122}/u', "(tm)", $text);
 		/*	Multiplication sign	*/
 		$text = str_replace ('&#215;', "x", $text);
+		$text = preg_replace ('/\xD7/u', "x", $text);
 
 		// Strip duble hyphenes and whitespaces
-		$text = preg_replace ('/-{2,}/', "-", $text);
+		$text = preg_replace ('/-{2,}/u', "-", $text);
 		$text = preg_replace ('/ {2,}/u', " ", $text);
 		$text = preg_replace ('/\n{2,}/u', "\n", $text);
 
