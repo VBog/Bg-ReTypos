@@ -27,14 +27,11 @@ class MyClientInterface extends TyposClientInterface {
     */
     protected function getArticleFromLink(string $link)
     {
-//		$id = url_to_postid($link);
-//		$post = get_post($id);
-
-		$path_parts = pathinfo($link);
-		$slug = explode("#", $path_parts['filename']); 				// Удаляем якорь, если есть
-		$slug = $slug[0]; 
+		$path_parts = explode("#", $link); 				// Удаляем якорь, если есть
+		$slug = basename(untrailingslashit($path_parts[0]));
 		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
-		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
+		
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link= ".$link. " slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
 		$post_types = get_post_types( [ 'publicly_queryable'=>1 ] );
 		$post_types['page'] = 'page';       // встроенный тип не имеет publicly_queryable
@@ -79,13 +76,11 @@ class MyClientInterface extends TyposClientInterface {
     {
         // $link = https://some-site.org/?article=$link
 
-//		$id = url_to_postid($link);
-
-		$path_parts = pathinfo($link);
-		$slug = explode("#", $path_parts['filename']); 				// Удаляем якорь, если есть
-		$slug = $slug[0]; 
+		$path_parts = explode("#", $link); 				// Удаляем якорь, если есть
+		$slug = basename(untrailingslashit($path_parts[0]));
 		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
-		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleIdFromLink: slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
+		
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link= ".$link. " slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
 		$post_types = get_post_types( [ 'publicly_queryable'=>1 ] );
 		$post_types['page'] = 'page';       // встроенный тип не имеет publicly_queryable
@@ -131,6 +126,7 @@ class MyClientInterface extends TyposClientInterface {
      */
     protected function clearText(string $text) {
 	
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . '^clearText_0: '. $text, 3, RETYPOS_DEBUG_FILE);
 		$option = get_option('retypos_options');
 		if (isset($option['clear_off']) && $option['clear_off']) return $text;
 
@@ -138,7 +134,7 @@ class MyClientInterface extends TyposClientInterface {
 		$text = strip_tags($text);
 		
 		/*	Double quotes */
-		$text = str_replace (array('&#8220;','&#8221;','&#8243;','&#171;','&#187;'), '\"', $text);
+		$text = str_replace (array('&#8220;','&#8221;','&#8243;','&#171;','&#187;'), '"', $text);
 		$text = preg_replace ('/[\x{201C}\x{201D}\x{2033}\x{00AB}\x{00BB}]/u', '"', $text);
 		/*	Single quotes */
 		$text = str_replace (array('&#8218;','&#8219;','&#8242;'), '\'', $text);

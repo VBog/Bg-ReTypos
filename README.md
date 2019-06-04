@@ -51,6 +51,10 @@ RewriteRule ^correctTypo$ /propovedi/wp-content/plugins/retypos/correctTypo.php 
 
 ## Changelog ##
 
+= 1.3.2 =
+
+* Исправлена бага при определении слага поста для ссылок формата /%postname%/#anchor
+
 = 1.3.1 =
 
 * Исправлена бага при замене специальных символов стандартными 
