@@ -27,11 +27,12 @@ class MyClientInterface extends TyposClientInterface {
     */
     protected function getArticleFromLink(string $link)
     {
-		$path_parts = explode("#", $link); 				// Удаляем якорь, если есть
-		$slug = basename(untrailingslashit($path_parts[0]));
+		$path_parts = explode("#", $link); 											// Удаляем якорь, если есть
+		$path_parts = explode(".", basename(untrailingslashit($path_parts[0])));	// Удаляем расширение, если есть
+		$slug = $path_parts[0];
 		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
 		
-		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link= ".$link. " slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link=".$link. " slug=".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
 		$post_types = get_post_types( [ 'publicly_queryable'=>1 ] );
 		$post_types['page'] = 'page';       // встроенный тип не имеет publicly_queryable
@@ -39,7 +40,7 @@ class MyClientInterface extends TyposClientInterface {
 
 		$post = get_page_by_path($slug, OBJECT, array_values($post_types));
 		if ($post) {
-			if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: id= ".$post->ID. " title= ".$post->post_title, 3, RETYPOS_DEBUG_FILE);
+			if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: id=".$post->ID. " title=".$post->post_title, 3, RETYPOS_DEBUG_FILE);
 			return new TyposArticle($post->ID, $post->post_content, $post->post_title, $post->post_excerpt);
 		} else {
             throw new \InvalidArgumentException();
@@ -61,7 +62,7 @@ class MyClientInterface extends TyposClientInterface {
 			'post_content'	=> $article->text
 		);
 		wp_update_post( $edited_post);
- 		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^saveArticle: id= ". $article->id. " title= ".$article->title, 3, RETYPOS_DEBUG_FILE);
+ 		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^saveArticle: id=". $article->id. " title=".$article->title, 3, RETYPOS_DEBUG_FILE);
 	}
 
     /**
@@ -76,11 +77,12 @@ class MyClientInterface extends TyposClientInterface {
     {
         // $link = https://some-site.org/?article=$link
 
-		$path_parts = explode("#", $link); 				// Удаляем якорь, если есть
-		$slug = basename(untrailingslashit($path_parts[0]));
+		$path_parts = explode("#", $link); 											// Удаляем якорь, если есть
+		$path_parts = explode(".", basename(untrailingslashit($path_parts[0])));	// Удаляем расширение, если есть
+		$slug = $path_parts[0];
 		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
 		
-		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link= ".$link. " slug= ".$slug, 3, RETYPOS_DEBUG_FILE);
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link=".$link. " slug=".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
 		$post_types = get_post_types( [ 'publicly_queryable'=>1 ] );
 		$post_types['page'] = 'page';       // встроенный тип не имеет publicly_queryable
@@ -89,7 +91,7 @@ class MyClientInterface extends TyposClientInterface {
 		$post = get_page_by_path($slug, OBJECT, array_values($post_types));
 
 		$id = $post->ID;	
- 		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleIdFromLink: id= ".$id, 3, RETYPOS_DEBUG_FILE);
+ 		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleIdFromLink: id=".$id, 3, RETYPOS_DEBUG_FILE);
 
         // Осуществить все необходимые проверки
 		// ID не может быть получен из ссылки
