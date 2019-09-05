@@ -5,7 +5,7 @@ Tags: ошибка, опечатка, исправление
 
 Requires at least: 3.0.1
 
-Tested up to: 5.2.1
+Tested up to: 5.2.3
 
 Stable tag: master
 
@@ -50,6 +50,10 @@ RewriteRule ^correctTypo$ /propovedi/wp-content/plugins/retypos/correctTypo.php 
 ```
 
 ## Changelog ##
+
+= 1.3.4 =
+
+* Исправлена бага при определении слага поста для ссылок с добавленным номером страницы, например /%postname%/68
 
 = 1.3.3 =
 

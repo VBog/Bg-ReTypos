@@ -27,10 +27,15 @@ class MyClientInterface extends TyposClientInterface {
     */
     protected function getArticleFromLink(string $link)
     {
-		$path_parts = explode("#", $link); 											// Удаляем якорь, если есть
-		$path_parts = explode(".", basename(untrailingslashit($path_parts[0])));	// Удаляем расширение, если есть
-		$slug = $path_parts[0];
-		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);	// Обрабатываем бред с "корварами"
+		$path_parts = parse_url($link);
+		$path_parts = $path_parts['path']; 
+
+		
+		$slug = basename($path_parts);
+		$slug = explode(".", $slug);											// Удаляем расширение, если есть
+		$slug = $slug[0];											
+		if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);				// Обрабатываем бред с "корварами"				
+		$path_parts = dirname($path_parts);
 		
 		if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link=".$link. " slug=".$slug, 3, RETYPOS_DEBUG_FILE);
 		// Список типов записей имеющих страницу во форонте
@@ -39,6 +44,14 @@ class MyClientInterface extends TyposClientInterface {
 		unset( $post_types['attachment'] ); // удалим attachment
 
 		$post = get_page_by_path($slug, OBJECT, array_values($post_types));
+		if (!$post) {	// Если первая попытка не удалась, то возможно это был номер страницы, а не slug
+			$slug = basename($path_parts);
+			$slug = explode(".", $slug);											// Удаляем расширение, если есть
+			$slug = $slug[0];											
+			if (substr($slug, 0, 2) == 'm-') $slug = substr($slug, 2);				// Обрабатываем бред с "корварами"				
+			if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: link=".$link. " slug2=".$slug, 3, RETYPOS_DEBUG_FILE);
+			if ($slug) $post = get_page_by_path($slug, OBJECT, array_values($post_types));
+		}
 		if ($post) {
 			if(RETYPOS_DEBUG) error_log( PHP_EOL . "^getArticleFromLink: id=".$post->ID. " title=".$post->post_title, 3, RETYPOS_DEBUG_FILE);
 			return new TyposArticle($post->ID, $post->post_content, $post->post_title, $post->post_excerpt);
