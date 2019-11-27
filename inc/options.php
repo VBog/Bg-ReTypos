@@ -4,13 +4,19 @@
 	
 *******************************************************************************************/
 // Начальные значения
-add_option('retypos_options', array('server_ip'=>'91.232.225.9','clear_off'=>0, 'debug'=>0));
+add_option('retypos_options', array('server_ip'=>'91.232.225.9','clear_off'=>0, 'contextmenu'=>1, 'container'=>'article.article', 'debug'=>0));
 $val = get_option('retypos_options');
 if (!isset($val['server_ip'])) {
 	$val['server_ip'] = '91.232.225.9';
 }	
 if (!isset($val['clear_off'])) {
 	$val['clear_off'] = 0;
+}	
+if (!isset($val['contextmenu'])) {
+	$val['contextmenu'] = 0;
+}	
+if (!isset($val['container'])) {
+	$val['container'] = 'article.article';
 }	
 if (!isset($val['debug'])) {
 	$val['debug'] = 0;
@@ -61,6 +67,8 @@ function retypos_settings(){
 	// параметры: $id, $title, $callback, $page, $section, $args
 	add_settings_field('retypos_server_ip', 'IP сервера', 'fill_retypos_server_ip', 'retypos_page', 'section_1' );
 	add_settings_field('retypos_clear_off', 'Отключить очистку текста', 'fill_retypos_clear_off', 'retypos_page', 'section_1' );
+	add_settings_field('retypos_contextmenu', 'Контекстное меню', 'fill_retypos_contextmenu', 'retypos_page', 'section_1' );
+	add_settings_field('retypos_container', 'Контейнер с текстом', 'fill_retypos_container', 'retypos_page', 'section_1' );
 	add_settings_field('retypos_debug', 'Включить отладку', 'fill_retypos_debug', 'retypos_page', 'section_1' );
 }
 
@@ -84,6 +92,23 @@ function fill_retypos_clear_off(){
 	<?php
 }
 ## Заполняем опцию 3
+function fill_retypos_contextmenu(){
+	$val = get_option('retypos_options');
+	$val = $val ? $val['contextmenu'] : null;
+	?>
+	<label><input type="checkbox" name="retypos_options[contextmenu]" value="1" <?php checked(1, $val ); ?>/> отметьте, чтобы включить контекстное меню. </label>
+	<?php
+}
+## Заполняем опцию 4
+function fill_retypos_container(){
+	$val = get_option('retypos_options');
+	$val = $val['container']; 
+	?>
+	<input type="text" name="retypos_options[container]" value="<?php echo esc_attr( $val ) ?>" size="60" /><br>
+	(По умолчанию <code>article.article</code>)
+	<?php
+}
+## Заполняем опцию 5
 function fill_retypos_debug(){
 	$val = get_option('retypos_options');
 	$val = $val ? $val['debug'] : null;
@@ -96,13 +121,15 @@ function retypos_sanitize_callback( $options ){
 	// очищаем
 	foreach( $options as $name => &$val ){
 		
-		if( $name == 'server_ip') {
+		if ($name == 'server_ip') {
 			$num = explode('.', $val );
 			if (count($num) == 4) {
 				$val = intval( $num[0] ).'.'. intval( $num[1] ).'.'. intval( $num[2] ).'.'. intval( $num[3] );
 			} else {
 				$val = '91.232.225.9';
 			}
+		} elseif ( $name == 'container'){
+			$val = esc_attr( $val );
 		} else {
 			$val = intval( $val );
 		}

@@ -3,7 +3,7 @@
     Plugin Name: Retypos 
     Plugin URI: https://gitlab.eterfund.ru/eterfund/
     Description: Позволяет пользователям Вашего сайта отправлять сообщения об опечатках на его страницах.
-    Version: 1.3.4
+    Version: 1.4
     Author: VBog
     Author URI: https://bogaiskov.ru 
 	License:     GPL2
@@ -36,7 +36,7 @@ if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
 
-define('RETYPOS_VERSION', '1.3.4');
+define('RETYPOS_VERSION', '1.4');
 define('RETYPOS_DEBUG_FILE', dirname(__FILE__ )."/retypos.log");
 
 //	options - страница настроек плагина
@@ -46,6 +46,9 @@ $option = get_option('retypos_options');
 define('RETYPOS_DEBUG', $option['debug']?true:false );
 define('RETYPOS_SERVER_IP', $option['server_ip']);
 
+function retypos_enqueue_frontend_styles () {
+	wp_enqueue_style( 'retypos_styles', plugins_url( '/css/styles.css', plugin_basename(__FILE__) ), array() , RETYPOS_VERSION  );
+}
 // JS скрипт 
 function retypos_enqueue_frontend_scripts () {
 /**************************************************************************************	
@@ -54,10 +57,18 @@ function retypos_enqueue_frontend_scripts () {
 	На странице сайта при нажатии комбинации клавиш "Ctrl+Enter" будет открыт модальный диалог, 
 	с помощью которого пользователи могут отправить сообщение об опечатках.
 ***************************************************************************************/
-	if ( is_single() || is_page()) 
-		wp_enqueue_script( 'retypos_proc', "https://unpkg.com/@etersoft/retypos-webclient", false, RETYPOS_VERSION, true );
+	if ( is_single() || is_page()) {
+		wp_enqueue_script( 'retypos_proc', plugins_url( '/js/retypos.js', __FILE__ ), array(), RETYPOS_VERSION, true );
+		wp_localize_script( 'retypos_proc', 'retypos', 
+			array( 
+				'contextmenu' => $option['contextmenu'], 
+				'container' => $option['container']
+			) 
+		);
+	}
 }	 
 if ( !is_admin() ) {
+	add_action( 'wp_enqueue_scripts' , 'retypos_enqueue_frontend_styles' );
 	add_action( 'wp_enqueue_scripts' , 'retypos_enqueue_frontend_scripts' ); 
 }
 // Функция, исполняемая при активации плагина
@@ -103,7 +114,7 @@ require_once __DIR__ .'/MyClientInterface.php';
 function retypos_banner() {
 	if ( is_single() || is_page()) {
 ?>	
-<img src="<?php echo plugin_dir_url( __FILE__ ); ?>img/retypos.png" alt="Выделите текст и нажмите Ctrl-Enter, если заметили опечатку" title="Выделите текст и нажмите Ctrl-Enter, если заметили опечатку">
+<img src="<?php echo plugin_dir_url( __FILE__ ); ?>img/retypos.svg" class="retypos-banner" alt="Выделите текст и нажмите Ctrl-Enter, если заметили опечатку" title="Выделите текст и нажмите Ctrl-Enter, если заметили опечатку">
 <?php
 	}
 }
