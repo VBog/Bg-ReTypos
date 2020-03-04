@@ -3,7 +3,7 @@
     Plugin Name: Retypos 
     Plugin URI: https://gitlab.eterfund.ru/eterfund/
     Description: Позволяет пользователям Вашего сайта отправлять сообщения об опечатках на его страницах.
-    Version: 1.4
+    Version: 1.4.1
     Author: VBog
     Author URI: https://bogaiskov.ru 
 	License:     GPL2
@@ -36,7 +36,7 @@ if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
 
-define('RETYPOS_VERSION', '1.4');
+define('RETYPOS_VERSION', '1.4.1');
 define('RETYPOS_DEBUG_FILE', dirname(__FILE__ )."/retypos.log");
 
 //	options - страница настроек плагина
@@ -57,6 +57,7 @@ function retypos_enqueue_frontend_scripts () {
 	На странице сайта при нажатии комбинации клавиш "Ctrl+Enter" будет открыт модальный диалог, 
 	с помощью которого пользователи могут отправить сообщение об опечатках.
 ***************************************************************************************/
+	$option = get_option('retypos_options');
 	if ( is_single() || is_page()) {
 		wp_enqueue_script( 'retypos_proc', plugins_url( '/js/retypos.js', __FILE__ ), array(), RETYPOS_VERSION, true );
 		wp_localize_script( 'retypos_proc', 'retypos', 
