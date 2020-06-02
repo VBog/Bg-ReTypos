@@ -51,6 +51,19 @@ RewriteRule ^correctTypo$ /propovedi/wp-content/plugins/retypos/correctTypo.php 
 
 ## Changelog ##
 
+= 1.5.1 =
+
+* Очищает модальное окно после его закрытия
+
+= 1.5.0 =
+
+* Возвращает на сервер путь к файлу correctTypo.php
+
+
+= 1.4.1 =
+
+* Fixed notice
+
 = 1.4.0 =
 
 * Заново переписана клиентская часть сервиса.
