@@ -147,6 +147,7 @@ jQuery (document).ready(function() {
 			context: context,			// TODO: context
 			corrected: correct,			// This is a correct variant
 			comment: comment,			// This is a comment for a correction
+			correctTypo: retypos.correctTypo // URL of script for run TyposClient
 		}
 
 		// Отправляем
@@ -166,18 +167,25 @@ jQuery (document).ready(function() {
 		});
 		setTimeout(function() {
 			jQuery('p#retyposMessage').html("");
-			jQuery('div#retyposModal').hide();
+			clearModal();
 		}, 3000);
 	});
 	
 	// Закрыть модальное окно
 	jQuery('span.retypos-close').click(function() {
-		jQuery('div#retyposModal').hide();
+		clearModal();
 	});
 	jQuery('button#retyposCancel').click(function() {
-		jQuery('div#retyposModal').hide();
+		clearModal();
 	});
 
+	function clearModal() {
+		jQuery('input#retyposContext').val('');
+		jQuery('input#retyposCorrected').val('');
+		jQuery('input#retyposComment').val('');
+		jQuery('div#retyposModal').hide();
+	}	
+		
 	function escapeHtml(text) {
 	  var map = {
 		'&': '&amp;',
