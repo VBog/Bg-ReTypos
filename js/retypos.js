@@ -121,6 +121,11 @@ jQuery (document).ready(function() {
 		// Отображение контекста на экране 
 		contextText = contextText.replace(typo, '<span class="selectedTypo">'+typo+'</span>');
 	
+		//Убрать переносы
+		typo = typo.replace(/\u00AD/g,'');
+		context = context.replace(/\u00AD/g,'');
+		contextText = contextText.replace(/\u00AD/g,'');
+	
 		// Заполняем тело модального окна
 		jQuery('div#retyposText').html(contextText);
 		jQuery('input#retyposTypo').val(escapeHtml(typo));
@@ -188,6 +193,7 @@ jQuery (document).ready(function() {
 		
 	function escapeHtml(text) {
 	  var map = {
+		'–': '-',
 		'&': '&amp;',
 		'<': '&lt;',
 		'>': '&gt;',

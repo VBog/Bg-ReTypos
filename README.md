@@ -51,6 +51,14 @@ RewriteRule ^correctTypo$ /propovedi/wp-content/plugins/retypos/correctTypo.php 
 
 ## Changelog ##
 
+= 1.5.2 =
+
+* Убирает переносы
+
+  ```
+  &shy;
+  ```
+
 = 1.5.1 =
 
 * Очищает модальное окно после его закрытия

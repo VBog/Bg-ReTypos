@@ -67,11 +67,19 @@ abstract class TyposClientInterface
      * @return array Array contains error code and optional message
      */
     public function fixTypo(string $typo, string $corrected, string $context, string $link) {
+		if(RETYPOS_DEBUG)error_log(PHP_EOL . 'link: '.$link, 3, RETYPOS_DEBUG_FILE);
         try {
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'getting article...', 3, RETYPOS_DEBUG_FILE);
             $article = $this->getArticleFromLink($link);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'article ok', 3, RETYPOS_DEBUG_FILE);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'replacing...', 3, RETYPOS_DEBUG_FILE);
             $this->replaceTypoInArticle($typo, $corrected, $context, $article);
-            $this->saveArticle($article);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'replaced ok', 3, RETYPOS_DEBUG_FILE);
+            if(RETYPOS_DEBUG)error_log(PHP_EOL . 'saving...', 3, RETYPOS_DEBUG_FILE);
+			$this->saveArticle($article);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'saved ok', 3, RETYPOS_DEBUG_FILE);
         } catch (\Exception $e) {
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'fail', 3, RETYPOS_DEBUG_FILE);
             return $this->getErrorMessage($e->getCode(), $e->getMessage());
         }
 
@@ -152,9 +160,10 @@ abstract class TyposClientInterface
         // Trying to replace typo in text
         try {
             $article->text = $this->replaceTypoInText($typo, $corrected, $context, $article->text);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'replaced in text', 3, RETYPOS_DEBUG_FILE);
             return;
         } catch (\Exception $e) {
-            error_log("Error while find a typo in article text. ".$e->getMessage());
+            error_log("Error while find a typo ({$typo}) in article text. ".$e->getMessage());
 			
 			// If a corrected of the typo is found in the text, remember this and, 
 			// if in other parts (title and subtitle) the typo or context is not found, 
@@ -173,6 +182,7 @@ abstract class TyposClientInterface
         // Trying to replace typo in title
         try {
             $article->title = $this->replaceTypoInText($typo, $corrected, $context, $article->title);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'replaced in title', 3, RETYPOS_DEBUG_FILE);
             return;
         } catch (\Exception $e) {
             error_log("Error while find a typo in article title. ".$e->getMessage());
@@ -187,6 +197,7 @@ abstract class TyposClientInterface
         // Trying to replace typo in subtitle
         try {
             $article->subtitle = $this->replaceTypoInText($typo, $corrected, $context, $article->subtitle);
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'replaced in subtitle', 3, RETYPOS_DEBUG_FILE);
         } catch (\Exception $e) {
             error_log("Error while find a typo in article subtitle. ".$e->getMessage());
             if (($e->getCode() == 404 || $e->getCode() == 405) && $isAlreadyFixed) {
@@ -219,7 +230,8 @@ abstract class TyposClientInterface
     private function replaceTypoInText(string $typo, string $corrected, string $context, string $text) {
         // Copy input string
         $originalText = $text;
-/*
+/*		
+		
         // BUG# 13121 
         $typo = str_replace("\xc2\xa0", " ", $typo);
         $corrected = str_replace("\xc2\xa0", " ", $corrected);
@@ -229,31 +241,44 @@ abstract class TyposClientInterface
 		// Clear texts from tags, replaces special characters with standard ones 
 //		$typo		= $this->clearText($typo);
 //		$corrected	= $this->clearText($corrected);
+		//if(RETYPOS_DEBUG) error_log( PHP_EOL . '^BeforeClear context:'. "{$context}", 3, RETYPOS_DEBUG_FILE);
+		//if(RETYPOS_DEBUG) error_log( PHP_EOL . '^BeforeClear text:'. "{$text}", 3, RETYPOS_DEBUG_FILE);
+
 		$context	= $this->clearText($context);
 		$text		= $this->clearText($text);
+		$typo = $this->clearText($typo);
+		$corrected = $this->clearText($corrected);
+		
+		if(RETYPOS_DEBUG)error_log(PHP_EOL . 'replacing: '.$typo.' => '.$corrected, 3, RETYPOS_DEBUG_FILE);
 
         // Find all typos in text, capture an offset of each typo
 		$pattern = preg_quote ($typo, '#');
+		//error_log( PHP_EOL . '^Try:'. "{$pattern}".PHP_EOL."IN===>{$context}", 3, RETYPOS_DEBUG_FILE);
+		
         if (!preg_match_all("#{$pattern}#u", $text, $typos, PREG_OFFSET_CAPTURE)) {
             // Check for already fixed typo
 			$pattern = preg_quote ($corrected, '#');
             if (preg_match("#{$pattern}#u", $text, $typos, PREG_OFFSET_CAPTURE)) {
+				if(RETYPOS_DEBUG)error_log(PHP_EOL . 'Already fixed', 3, RETYPOS_DEBUG_FILE);
                 throw new \Exception("Already fixed", 208);
             }
-
+			
+			if(RETYPOS_DEBUG)error_log(PHP_EOL . 'Typo not found', 3, RETYPOS_DEBUG_FILE);
             throw new \Exception("Typo not found", 404);
         }
 
         // Find a context in text, capture it offset
-        
+        if(RETYPOS_DEBUG)error_log(PHP_EOL . 'matched, not fixed', 3, RETYPOS_DEBUG_FILE);
 
 		$pattern = preg_quote ($context, '#');
+		if(RETYPOS_DEBUG) error_log( PHP_EOL . '^Searhed_context:'. "#{$pattern}#u" .' >===IN===> '. "{$text}", 3, RETYPOS_DEBUG_FILE);
 		if (!preg_match("#{$pattern}#u", $text, $contextMatch, PREG_OFFSET_CAPTURE)) {
 			// If a context was changed then report an error,
 			// cannot locate typo in a new context, must be
 			// fixed manually
 			throw new \Exception("Context not found", 405);
         }
+		if(RETYPOS_DEBUG)error_log(PHP_EOL . 'context found', 3, RETYPOS_DEBUG_FILE);
 
         $contextOffset = $contextMatch[0][1];
 
@@ -266,6 +291,7 @@ abstract class TyposClientInterface
                 break;
             }
         }
+		if(RETYPOS_DEBUG)error_log(PHP_EOL . 'offset found', 3, RETYPOS_DEBUG_FILE);
 
         // Fix a match with index = $indexOfTypo
         $index = 0;
@@ -280,6 +306,10 @@ abstract class TyposClientInterface
                 return $match[0];
             },
             $originalText);
+			
+		//$neo_context = str_replace($typo, $corrected, $context);
+			
+		//return str_replace($context, $neo_context, $text);
     }
 
     /**

@@ -148,6 +148,9 @@ class MyClientInterface extends TyposClientInterface {
 		// Strip all tags from text
 		$text = strip_tags($text);
 		
+		//remove shy
+		$text = preg_replace('~\x{00AD}~u', '', $text);
+		
 		/*	Double quotes */
 		$text = str_replace (array('&#8220;','&#8221;','&#8243;','&#171;','&#187;'), '"', $text);
 		$text = preg_replace ('/[\x{201C}\x{201D}\x{2033}\x{00AB}\x{00BB}]/u', '"', $text);
